@@ -11,12 +11,14 @@ main = promptMove emptyBoard
 
 promptMove :: Board -> IO()
 promptMove board = do
-  if False
-    then return ()
-    else do
-      printBoard board
-      play <- getLine
-      promptMove (makeMove board (toCoords play))
+  printBoard board
+  if (canPlay board)
+    then do play <- getLine
+            promptMove (makeMove board (toCoords play))
+    else do printResult board
+
+canPlay :: Board -> Bool
+canPlay board = True
 
 makeMove :: Board -> (Int, Int) -> Board
 makeMove (rowA, rowB, rowC, move) (0,col) = ((makeRowMove rowA col move), rowB, rowC, (not move))
@@ -24,9 +26,12 @@ makeMove (rowA, rowB, rowC, move) (1,col) = (rowA, (makeRowMove rowB col move), 
 makeMove (rowA, rowB, rowC, move) (2,col) = (rowA, rowB, (makeRowMove rowC col move), (not move))
 
 makeRowMove :: BoardRow -> Int -> Bool -> BoardRow
-makeRowMove (_,b,c) 0 move = ((Square (moveToChar move)), b, c)
-makeRowMove (a,_,c) 1 move = (a, (Square (moveToChar move)), c)
-makeRowMove (a,b,_) 2 move = (a, b, (Square (moveToChar move)))
+makeRowMove (_,b,c) 0 move = ((moveToSquare move), b, c)
+makeRowMove (a,_,c) 1 move = (a, (moveToSquare move), c)
+makeRowMove (a,b,_) 2 move = (a, b, (moveToSquare move))
+
+moveToSquare :: Bool -> Square
+moveToSquare m = Square (moveToChar m)
 
 printBoard :: Board -> IO ()
 printBoard (a,b,c,m) = do
@@ -36,6 +41,9 @@ printBoard (a,b,c,m) = do
   putStrLn "-------"
   putRow c
   putStrLn [(moveToChar m)]
+
+printResult :: Board -> IO ()
+printResult board = putStrLn "Game finished!"
 
 putRow :: BoardRow -> IO ()
 putRow (a, b, c) = putStrLn (" " ++ (squareToStr a) ++ "|" ++ (squareToStr b) ++ "|" ++ (squareToStr c) ++ " ")
