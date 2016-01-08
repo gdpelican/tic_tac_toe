@@ -21,14 +21,14 @@ canPlay :: Board -> Bool
 canPlay board = True
 
 makeMove :: Board -> (Int, Int) -> Board
-makeMove (rowA, rowB, rowC, move) (0,col) = ((makeRowMove rowA col move), rowB, rowC, (not move))
-makeMove (rowA, rowB, rowC, move) (1,col) = (rowA, (makeRowMove rowB col move), rowC, (not move))
-makeMove (rowA, rowB, rowC, move) (2,col) = (rowA, rowB, (makeRowMove rowC col move), (not move))
+makeMove (a, b, c, move) (0, col) = ((makeColMove ([a,b,c] !! 0) col move), b, c, (not move))
+makeMove (a, b, c, move) (1, col) = (a, (makeColMove ([a,b,c] !! 1) col move), c, (not move))
+makeMove (a, b, c, move) (2, col) = (a, b, (makeColMove ([a,b,c] !! 2) col move), (not move))
 
-makeRowMove :: BoardRow -> Int -> Bool -> BoardRow
-makeRowMove (_,b,c) 0 move = ((moveToSquare move), b, c)
-makeRowMove (a,_,c) 1 move = (a, (moveToSquare move), c)
-makeRowMove (a,b,_) 2 move = (a, b, (moveToSquare move))
+makeColMove :: BoardRow -> Int -> Bool -> BoardRow
+makeColMove (a, b, c) 0 move = ((moveToSquare move), b, c)
+makeColMove (a, b, c) 1 move = (a, (moveToSquare move), c)
+makeColMove (a, b, c) 2 move = (a, b, (moveToSquare move))
 
 moveToSquare :: Bool -> Square
 moveToSquare m = Square (moveToChar m)
@@ -47,14 +47,12 @@ printResult board = putStrLn "Game finished!"
 
 putRow :: BoardRow -> IO ()
 putRow (a, b, c) = putStrLn (" " ++ (squareToStr a) ++ "|" ++ (squareToStr b) ++ "|" ++ (squareToStr c) ++ " ")
+  where squareToStr (Square c) = [c]
 
 moveToChar :: Bool -> Char
 moveToChar s = case s of
   True -> 'X'
   False -> 'O'
-
-squareToStr :: Square -> String
-squareToStr (Square c) = [c]
 
 toCoords :: String -> (Int, Int)
 toCoords s = (digitToInt (head s), digitToInt (last s))
